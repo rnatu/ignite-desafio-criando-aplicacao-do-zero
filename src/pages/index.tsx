@@ -1,4 +1,5 @@
 import { GetStaticProps } from 'next';
+import Link from 'next/link';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
@@ -33,24 +34,33 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
   // TODO
   return (
-    <main className={styles.container}>
+    <main className={commonStyles.container}>
       <Header />
 
-      <ul className={styles.posts}>
+      <div className={styles.posts}>
         {postsPagination.results.map(post => (
-          <li key={post.uid}>
-            <strong className={styles.title}>{post.data.title}</strong>
-            <p className={styles.subtitle}>{post.data.subtitle}</p>
-            <div className={styles.info}>
-              <FiCalendar size="1.25rem" />
-              <span>{post.first_publication_date}</span>
-              <FiUser size="1.25rem" /> <span>{post.data.author}</span>
-            </div>
-          </li>
+          <Link href={`/post/${post.uid}`} key={post.uid}>
+            <a>
+              <strong className={styles.title}>{post.data.title}</strong>
+              <p className={styles.subtitle}>{post.data.subtitle}</p>
+              <div className={commonStyles.info}>
+                <FiCalendar size="1.25rem" />
+                <time>{post.first_publication_date}</time>
+                <FiUser size="1.25rem" />
+                <span>{post.data.author}</span>
+              </div>
+            </a>
+          </Link>
         ))}
-      </ul>
+      </div>
 
-      <button type="button">Carregar mais posts</button>
+      {postsPagination.next_page ? (
+        <button className={styles.buttonLoadMore} type="button">
+          Carregar mais posts
+        </button>
+      ) : (
+        ''
+      )}
     </main>
   );
 }
@@ -62,8 +72,6 @@ export const getStaticProps: GetStaticProps = async () => {
     Prismic.Predicates.at('document.type', 'posts'),
     { orderings: '[my.blog_post.date desc]' }
   );
-
-  // console.log(JSON.stringify(postsResponse, null, 2));
 
   const formattedResults = postsResponse.results.map(post => {
     return {
@@ -87,8 +95,6 @@ export const getStaticProps: GetStaticProps = async () => {
     next_page: postsResponse.next_page,
     results: [...formattedResults],
   };
-
-  console.log(postsPagination.results);
 
   return {
     props: {
