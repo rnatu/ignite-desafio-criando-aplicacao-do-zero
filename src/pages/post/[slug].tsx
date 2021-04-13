@@ -1,4 +1,8 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
+import { RichText } from 'prismic-dom';
+import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -26,22 +30,80 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post(): JSX.Element {
+export default function Post({ post }: PostProps): JSX.Element {
   // TODO
+  return (
+    <>
+      <Link href="/">
+        <a>
+          <Header />
+        </a>
+      </Link>
 
-  return <h1>Olá</h1>;
+      <img className={styles.banner} src={post.data.banner.url} alt="banner" />
+
+      <main className={commonStyles.container}>
+        <article className={styles.post}>
+          <h1>{post.data.title}</h1>
+
+          <div className={commonStyles.info}>
+            <FiCalendar size="1.25rem" />
+            <time>{post.first_publication_date}</time>
+            <FiUser size="1.25rem" />
+            <span>{post.data.author}</span>
+            <FiClock size="1.25rem" />
+            <span>5 min</span>
+          </div>
+
+          <div
+            className={styles.postContent}
+            dangerouslySetInnerHTML={{ __html: post.data.content }}
+          />
+        </article>
+      </main>
+    </>
+  );
 }
 
-// export const getStaticPaths = async () => {
-//   const prismic = getPrismicClient();
-//   const posts = await prismic.query(TODO);
+export const getStaticPaths: GetStaticPaths = async () => {
+  const prismic = getPrismicClient();
+  // TODO
+  // const posts = await prismic.query(TODO);
 
-//   // TODO
-// };
+  return {
+    paths: [],
+    fallback: 'blocking',
+  };
+};
 
-// export const getStaticProps = async context => {
-//   const prismic = getPrismicClient();
-//   const response = await prismic.getByUID(TODO);
+export const getStaticProps = async context => {
+  const prismic = getPrismicClient();
+  // TODO
+  const response = await prismic.getByUID(
+    'posts',
+    String(context.params.slug),
+    {}
+  );
 
-//   // TODO
-// };
+  const post = {
+    first_publication_date: response.first_publication_date,
+    data: {
+      title: response.data.title,
+      banner: {
+        url: response.data.banner.url,
+      },
+      author: response.data.author,
+      content: response.data.content,
+    },
+  };
+
+  console.log(post.data.content);
+
+  // console.log(JSON.stringify(response, null, 2));
+
+  return {
+    props: {
+      post,
+    },
+  };
+};

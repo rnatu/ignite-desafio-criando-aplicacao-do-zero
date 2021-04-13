@@ -7,8 +7,6 @@ import { format } from 'date-fns';
 import ptBr from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../services/prismic';
 
-import Header from '../components/Header';
-
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
@@ -35,7 +33,9 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   // TODO
   return (
     <main className={commonStyles.container}>
-      <Header />
+      <div className={styles.homeLogo}>
+        <img src="/images/logo.svg" alt="logo" />
+      </div>
 
       <div className={styles.posts}>
         {postsPagination.results.map(post => (

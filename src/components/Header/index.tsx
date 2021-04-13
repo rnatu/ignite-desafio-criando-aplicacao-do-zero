@@ -1,4 +1,10 @@
+import styles from './header.module.scss';
+
 export default function Header(): JSX.Element {
   // TODO
-  return <img src="/images/logo.svg" alt="logo" />;
+  return (
+    <div className={styles.header}>
+      <img src="/images/logo.svg" alt="logo" />
+    </div>
+  );
 }
