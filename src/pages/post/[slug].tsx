@@ -1,7 +1,11 @@
+/* eslint-disable react/no-danger */
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
-import { RichText } from 'prismic-dom';
+
+import { format } from 'date-fns';
+import ptBr from 'date-fns/locale/pt-BR';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import { RichText } from 'prismic-dom';
 import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
@@ -55,10 +59,20 @@ export default function Post({ post }: PostProps): JSX.Element {
             <span>5 min</span>
           </div>
 
-          <div
-            className={styles.postContent}
-            dangerouslySetInnerHTML={{ __html: post.data.content }}
-          />
+          {post.data.content.map(content => (
+            <div className={styles.postContent}>
+              <h2
+                key={content.heading}
+                className={styles.postHeading}
+                dangerouslySetInnerHTML={{ __html: content.heading }}
+              />
+
+              <div
+                className={styles.postBody}
+                dangerouslySetInnerHTML={{ __html: String(content.body) }}
+              />
+            </div>
+          ))}
         </article>
       </main>
     </>
@@ -76,7 +90,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps = async context => {
+export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   // TODO
   const response = await prismic.getByUID(
@@ -85,21 +99,32 @@ export const getStaticProps = async context => {
     {}
   );
 
+  const formattedContent = response.data.content.map(content => {
+    return {
+      heading: content.heading,
+      body: RichText.asHtml(content.body),
+    };
+  });
+
   const post = {
-    first_publication_date: response.first_publication_date,
+    first_publication_date: format(
+      new Date(response.first_publication_date),
+      'MM LLL yyyy',
+      {
+        locale: ptBr,
+      }
+    ),
     data: {
       title: response.data.title,
       banner: {
         url: response.data.banner.url,
       },
       author: response.data.author,
-      content: response.data.content,
+      content: formattedContent,
     },
   };
 
-  console.log(post.data.content);
-
-  // console.log(JSON.stringify(response, null, 2));
+  // console.log(JSON.stringify(post.data.content, null, 2));
 
   return {
     props: {
