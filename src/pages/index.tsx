@@ -5,6 +5,7 @@ import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBr from 'date-fns/locale/pt-BR';
+import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -31,6 +32,24 @@ interface HomeProps {
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
   // TODO
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
+
+  const [nextPageData, setNextPageData] = useState<Post[]>();
+
+  function handleNextPage(): void {
+    fetch(nextPage)
+      .then(response => response.json())
+      .then(data => {
+        setNextPage(data.next_page);
+
+        if (nextPageData) {
+          setNextPageData([...nextPageData, ...data.results]);
+        } else {
+          setNextPageData(data.results);
+        }
+      });
+  }
+
   return (
     <main className={commonStyles.container}>
       <div className={styles.homeLogo}>
@@ -52,10 +71,39 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </a>
           </Link>
         ))}
+
+        {nextPageData
+          ? nextPageData.map(post => (
+              <Link href={`/post/${post.uid}`} key={post.uid}>
+                <a>
+                  <strong className={styles.title}>{post.data.title}</strong>
+                  <p className={styles.subtitle}>{post.data.subtitle}</p>
+                  <div className={commonStyles.info}>
+                    <FiCalendar size="1.25rem" />
+                    <time>
+                      {format(
+                        new Date(post.first_publication_date),
+                        'MM LLL yyyy',
+                        {
+                          locale: ptBr,
+                        }
+                      )}
+                    </time>
+                    <FiUser size="1.25rem" />
+                    <span>{post.data.author}</span>
+                  </div>
+                </a>
+              </Link>
+            ))
+          : ''}
       </div>
 
-      {postsPagination.next_page ? (
-        <button className={styles.buttonLoadMore} type="button">
+      {nextPage ? (
+        <button
+          className={styles.buttonLoadMore}
+          type="button"
+          onClick={handleNextPage}
+        >
           Carregar mais posts
         </button>
       ) : (
@@ -70,7 +118,9 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     // TODO
     Prismic.Predicates.at('document.type', 'posts'),
-    { orderings: '[my.blog_post.date desc]' }
+    {
+      pageSize: 1,
+    }
   );
 
   const formattedResults = postsResponse.results.map(post => {
