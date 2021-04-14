@@ -3,12 +3,10 @@
   max-width: 1120px;
   margin: 0 auto;
   padding: 2.5rem 13.12rem;
-
-  display: inline-block;
 }
 
 @media(max-width: 720px) {
   .header {
-      padding: 2.5rem 2rem;
+      padding: 2rem;
   }
 }

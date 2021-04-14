@@ -33,7 +33,6 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
   // TODO
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
-
   const [nextPageData, setNextPageData] = useState<Post[]>();
 
   function handleNextPage(): void {
@@ -64,7 +63,15 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               <p className={styles.subtitle}>{post.data.subtitle}</p>
               <div className={commonStyles.info}>
                 <FiCalendar size="1.25rem" />
-                <time>{post.first_publication_date}</time>
+                <time>
+                  {format(
+                    new Date(post.first_publication_date),
+                    'dd MMM uuuu',
+                    {
+                      locale: ptBr,
+                    }
+                  )}
+                </time>
                 <FiUser size="1.25rem" />
                 <span>{post.data.author}</span>
               </div>
@@ -131,13 +138,7 @@ export const getStaticProps: GetStaticProps = async () => {
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'MM LLL yyyy',
-        {
-          locale: ptBr,
-        }
-      ),
+      first_publication_date: post.first_publication_date,
     };
   });
 
