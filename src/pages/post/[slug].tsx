@@ -92,7 +92,7 @@ export default function Post({ post }: PostProps): JSX.Element {
               <div
                 className={styles.postBody}
                 dangerouslySetInnerHTML={{
-                  __html: String(RichText.asHtml(content.body)),
+                  __html: RichText.asHtml(content.body),
                 }}
               />
             </div>
