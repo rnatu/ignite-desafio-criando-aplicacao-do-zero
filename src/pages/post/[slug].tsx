@@ -126,23 +126,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   // TODO
-  const response = await prismic.getByUID(
-    'posts',
-    String(context.params.slug),
-    {}
-  );
-
-  const post = {
-    first_publication_date: response.first_publication_date,
-    data: {
-      title: response.data.title,
-      banner: {
-        url: response.data.banner.url,
-      },
-      author: response.data.author,
-      content: response.data.content,
-    },
-  };
+  const post = await prismic.getByUID('posts', String(context.params.slug), {});
 
   return {
     props: {
