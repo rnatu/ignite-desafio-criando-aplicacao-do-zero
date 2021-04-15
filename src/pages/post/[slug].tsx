@@ -33,16 +33,30 @@ interface Post {
 
 interface PostProps {
   post: Post;
-  timeReading: number;
 }
 
-export default function Post({ post, timeReading }: PostProps): JSX.Element {
+export default function Post({ post }: PostProps): JSX.Element {
   // TODO
   const router = useRouter();
 
   if (router.isFallback) {
     return <div>Carregando...</div>;
   }
+
+  const postText = post.data.content.map(text => {
+    return {
+      heading: text.heading,
+      body: RichText.asText(text.body),
+    };
+  });
+
+  const totalWords = postText.reduce((accum, curr) => {
+    return (
+      accum + (curr.heading.split(/\s/g).length + curr.body.split(/\s/g).length)
+    );
+  }, 0);
+
+  const timeReading = Math.ceil(totalWords / 200);
 
   return (
     <>
@@ -77,7 +91,9 @@ export default function Post({ post, timeReading }: PostProps): JSX.Element {
 
               <div
                 className={styles.postBody}
-                dangerouslySetInnerHTML={{ __html: String(content.body) }}
+                dangerouslySetInnerHTML={{
+                  __html: String(RichText.asHtml(content.body)),
+                }}
               />
             </div>
           ))}
@@ -116,21 +132,6 @@ export const getStaticProps: GetStaticProps = async context => {
     {}
   );
 
-  const postText = response.data.content.map(text => {
-    return {
-      heading: text.heading,
-      body: RichText.asText(text.body),
-    };
-  });
-
-  const totalWords = postText.reduce((accum, curr) => {
-    return (
-      accum + (curr.heading.split(/\s/g).length + curr.body.split(/\s/g).length)
-    );
-  }, 0);
-
-  const timeReading = Math.ceil(totalWords / 200);
-
   const post = {
     first_publication_date: response.first_publication_date,
     data: {
@@ -146,7 +147,6 @@ export const getStaticProps: GetStaticProps = async context => {
   return {
     props: {
       post,
-      timeReading,
     },
   };
 };
