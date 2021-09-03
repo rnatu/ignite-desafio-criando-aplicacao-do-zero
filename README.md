@@ -27,8 +27,7 @@ Nesse desafio, criei uma aplicação para treinar o que aprendi até a
 
 <p align="center">
   <a href="#-sobre-o-projeto">Sobre o projeto</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-tecnologias-utilizadas">Tecnologias utilizadas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#ℹ️-Como-utilizar">Como utilizar</a>
+  <a href="#-tecnologias-utilizadas">Tecnologias utilizadas</a>
 </p>
 
 <br>
@@ -51,7 +50,7 @@ Nesta aplicação o meu principal objetivo foi criar um blog do zero. Recebi um
 
 Este Desafio visa o aprendizado com as bases do NextJS (ReactJS) e TypeScript.
 
-## 🚀 As tecnologias utilizadas foram
+## 🚀 Tecnologias utilizadas
 
 - [NextJS](https://nextjs.org/) (ReactJS)
   - [Prismic](https://prismic.io/) (Headless CMS)
